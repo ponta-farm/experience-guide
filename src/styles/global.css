@@ -1,0 +1,32 @@
+:root {
+  font-family: system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #3d3026;
+  background: #faf6ed;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  width: min(100% - 2rem, 40rem);
+  margin: 4rem auto;
+  padding-block: 1.5rem;
+  border-block-start: 4px solid #4b6748;
+}
+
+.farm-name {
+  color: #4b6748;
+  font-weight: 700;
+}
+
+h1 {
+  font-size: 1.5rem;
+  line-height: 1.5;
+}
