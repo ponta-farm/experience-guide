@@ -2,6 +2,8 @@
 
 2026-11-08に、2026-11-15（日）の開催に向けて公式の営業予定と取扱品を確認した。候補22件のうち掲載19件、除外3件。確認日以降の臨時休業や在庫は保証せず、利用前に公式情報を確認する。
 
+2026-11-10にマクドナルド 真鍋新町店の営業時間と注意書きを再確認し、深夜の利用方法と月曜の閉店時間を反映した。
+
 ## 掲載店舗
 
 | 店舗 | 公式の営業情報・確認根拠 | 確認日 |
@@ -10,7 +12,7 @@
 | 熟成焼肉いちばん 土浦真鍋店 | 公式店舗ページの通常営業時間。日曜の別時間・開催日休業の記載なし。 [公式1](https://maps.jukusei-ichiban.jp/jp/detail/4646.html) | 2026-11-08 |
 | かつや 茨城土浦店 | 公式店舗ページの通常営業時間。開催日休業の記載なし。 [公式1](https://shop.arclandservice.co.jp/ae-shop/spot/detail?code=308) / [公式2](https://www.arclandservice.co.jp/katsuya/menu/?identifier=gm-katsuben) | 2026-11-08 |
 | 丸亀製麺土浦 | 公式ページのRestaurant構造化データopeningHoursで日曜Su 10:30-21:30を確認。 [公式1](https://stores.marugame.com/110269) | 2026-11-08 |
-| マクドナルド 真鍋新町店 | 公式営業時間表の休日欄。月曜2:00～5:00のメンテナンス告知あり。 [公式1](https://map.mcdonalds.co.jp/map/08012) / [公式2](https://www.mcdonalds.co.jp/menu/regular/) | 2026-11-08 |
+| マクドナルド 真鍋新町店 | 公式営業時間表の休日欄と注意書き。0:00～2:00は持ち帰りのみ、2:00～5:00はドライブスルーのみ。毎週月曜2:00～5:00はメンテナンスのため閉店。 [公式1](https://map.mcdonalds.co.jp/map/08012) / [公式2](https://www.mcdonalds.co.jp/menu/regular/) | 2026-11-10 |
 | ココス 土浦店 | 公式営業時間表の土日祝欄。 [公式1](https://maps.cocos-jpn.co.jp/jp/detail/2577.html) / [公式2](https://www.cocos-jpn.co.jp/menu/) | 2026-11-08 |
 | 夢庵 土浦真鍋店 | 公式営業時間表の日曜・祝日欄。 [公式1](https://store-info.skylark.co.jp/yumean/map/130050/) / [公式2](https://www.skylark.co.jp/yumean/) | 2026-11-08 |
 | 坂東太郎 土浦おおつ野店 | 公式店舗情報は月～日営業、定休日なし。 [公式1](https://shop.bandotaro.co.jp/detail/419/) | 2026-11-08 |

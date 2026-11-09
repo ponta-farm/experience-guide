@@ -86,10 +86,10 @@ export const places: Place[] = [
     "description": "バーガーやサイドメニュー、飲み物。",
     "address": "茨城県土浦市真鍋新町20-36",
     "officialUrl": "https://map.mcdonalds.co.jp/map/08012",
-    "checkedAt": "2026-11-08",
+    "checkedAt": "2026-11-10",
     "roadKm": null,
     "carMinutes": null,
-    "hours": "店内5:00～翌2:00、ドライブスルー24時間",
+    "hours": "店内での飲食5:00～24:00、0:00～2:00は持ち帰りのみ。ドライブスルー24時間（毎週月曜2:00～5:00はメンテナンスのため閉店）。",
     "distanceSource": {
       "status": "unavailable",
       "checkedAt": "2026-11-08"
