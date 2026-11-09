@@ -1,0 +1,130 @@
+---
+import { Image } from 'astro:assets';
+import summerImage from '../assets/clothing-summer-v2.png';
+import winterImage from '../assets/clothing-winter-v2.png';
+import { clothing, householdItems, optionalItems } from '../data/packing';
+import { event } from '../data/event';
+import { formatEventDate } from '../lib/event';
+
+const seasons = [
+  { id: 'summer' as const, title: '夏の服装', note: '暑い季節も、薄手の長袖Tシャツで。', image: summerImage },
+  { id: 'winter' as const, title: '冬の服装', note: '長袖の服に、防寒上着も重ねましょう。', image: winterImage },
+];
+---
+
+<section id="packing" class="section" aria-labelledby="packing-title">
+  <p class="eyebrow">汚れても大丈夫な服で</p>
+  <h2 id="packing-title">服装と持ち物</h2>
+  <p>左の大きい子はぽんのすけくん、右の小さい子はぽんたくん。ふたりと一緒に、足元まで準備しましょう。</p>
+  <div class="season-switch" role="group" aria-label="服装の季節" data-season-switch hidden>
+    {seasons.map((season) => <button type="button" data-season={season.id} aria-pressed="false" aria-controls={`clothing-${season.id}`}>{season.title}</button>)}
+  </div>
+  {seasons.map((season) => (
+    <figure id={`clothing-${season.id}`} class="clothing-figure" data-clothing-season={season.id}>
+      <figcaption><h3>{season.title}</h3><p>{season.note}</p></figcaption>
+      <div class="clothing-diagram">
+        <Image src={season.image} alt={`${season.title}のぽんのすけくんとぽんたくん。帽子・長袖・長ズボン・軍手・靴下・長靴を着用。`} widths={[400, 640, 900]} sizes="(min-width: 48rem) 400px, 65vw" format="webp" quality={80} loading="lazy" />
+        <svg class="clothing-lines" viewBox="0 0 100 100" aria-hidden="true">
+          {clothing.map((item) => <><line x1={item.side === 'left' ? 18 : 82} y1={item.top + 5} x2={item.target[0]} y2={item.target[1]} /><circle cx={item.target[0]} cy={item.target[1]} r=".7" /></>)}
+        </svg>
+        {clothing.map((item) => <span class={`clothing-label ${item.side}`} style={`top:${item.top}%`}><b>{item.number}</b><span>{item.shortLabel}</span></span>)}
+      </div>
+    </figure>
+  ))}
+  <noscript><p class="note">夏・冬の両方を表示しています。チェックはこの画面で使えますが、再訪時には保存されません。</p></noscript>
+
+  <div class="packing-checklist">
+    <h3>各家庭で準備するもの</h3>
+    <p>絵と同じ番号で、ひとつずつ確認できます。子ども用の軍手・長靴はほとんど用意がないため、必ずお持ちください。</p>
+    <ul class="packing-list">
+      {clothing.map((item) => <li><label><input type="checkbox" data-packing-id={item.id} /><span><strong>{item.number} {item.label}</strong><span class="packing-detail"><span data-clothing-season="summer">{item.summer}</span><span data-clothing-season="winter">{item.winter}</span></span></span></label></li>)}
+      {householdItems.map((item) => <li><label><input type="checkbox" data-packing-id={item.id} /><span><strong>{item.label}</strong><span class="packing-detail">{item.detail}</span></span></label></li>)}
+    </ul>
+    <h3>あると便利なもの</h3>
+    <ul class="packing-list">
+      {optionalItems.map((item) => <li><label><input type="checkbox" data-packing-id={item.id} /><span><strong>{item.label}</strong><span class="packing-detail">{item.detail}</span></span></label></li>)}
+    </ul>
+    <div class="packing-summary" data-packing-controls hidden>
+      <p data-packing-count role="status" aria-live="polite"></p>
+      <button type="button" data-packing-reset>チェックをリセット</button>
+      <p class="service-note">チェックは開催日ごとに、この端末に保存します。別の端末には引き継がれません。</p>
+      <p data-packing-warning role="status" hidden></p>
+    </div>
+  </div>
+  <aside class="note host-supplies">
+    <h3>主催者が用意するもの</h3>
+    <p>飲み物・シャベル・スコップ・虫除け・大人用軍手は主催者が用意します。</p>
+    <p>大人用長靴の貸出は事前相談です。<strong>{formatEventDate(event.bootRentalDeadline.date)} {event.bootRentalDeadline.period}まで</strong>に<a href={event.contact.lineUrl}>LINEでご相談ください</a>。</p>
+  </aside>
+</section>
+
+<script>
+  import { checklistIds } from '../data/packing';
+  import type { Season } from '../data/packing';
+  import { event } from '../data/event';
+  import { checklistStorageKey } from '../lib/event';
+  import { restoreChecklist, saveChecklist, seasonAt } from '../lib/packing';
+
+  const root = document.querySelector<HTMLElement>('#packing')!;
+  const buttons = root.querySelectorAll<HTMLButtonElement>('[data-season]');
+  function selectSeason(season: Season) {
+    root.querySelectorAll<HTMLElement>('[data-clothing-season]').forEach((element) => {
+      element.hidden = element.dataset.clothingSeason !== season;
+    });
+    buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.season === season)));
+  }
+  selectSeason(seasonAt(new Date()));
+  root.querySelector<HTMLElement>('[data-season-switch]')!.hidden = false;
+  buttons.forEach((button) => button.addEventListener('click', () => selectSeason(button.dataset.season as Season)));
+
+  const inputs = [...root.querySelectorAll<HTMLInputElement>('[data-packing-id]')];
+  const key = checklistStorageKey(event);
+  const storage = () => window.localStorage;
+  const restored = restoreChecklist(storage, key, checklistIds);
+  const warning = root.querySelector<HTMLElement>('[data-packing-warning]')!;
+  function showWarning(message: string) { warning.textContent = message; warning.hidden = !message; }
+  inputs.forEach((input) => { input.checked = restored.checked.includes(input.dataset.packingId!); });
+  if (restored.issue === 'unavailable') showWarning('この端末では保存できません。チェックはこの画面で使えます。');
+  if (restored.issue === 'corrupt') showWarning('保存されたチェックを読み込めなかったため、空の状態で始めます。');
+  function updateCount() {
+    root.querySelector<HTMLElement>('[data-packing-count]')!.textContent = `準備済み ${inputs.filter((input) => input.checked).length} / ${inputs.length} 件（あると便利なものを含む）`;
+  }
+  function persist() {
+    const checked = inputs.filter((input) => input.checked).map((input) => input.dataset.packingId!);
+    showWarning(saveChecklist(storage, key, checked) ? '' : 'この端末では保存できません。チェックはこの画面で使えます。');
+    updateCount();
+  }
+  inputs.forEach((input) => input.addEventListener('change', persist));
+  root.querySelector<HTMLButtonElement>('[data-packing-reset]')!.addEventListener('click', () => {
+    inputs.forEach((input) => { input.checked = false; });
+    persist();
+  });
+  updateCount();
+  root.querySelector<HTMLElement>('[data-packing-controls]')!.hidden = false;
+</script>
+
+<style>
+  .season-switch { display: flex; gap: .7rem; margin: 1.5rem 0; }
+  button { min-height: 48px; padding: .6rem 1rem; border: 1px solid var(--green); border-radius: 6px; color: var(--green); background: #fffdf8; cursor: pointer; }
+  .season-switch button[aria-pressed="true"] { background: var(--green); color: #fffdf8; font-weight: 700; }
+  .clothing-figure { max-width: 38rem; margin: 1.5rem auto; }
+  .clothing-figure figcaption { text-align: center; }
+  .clothing-figure figcaption h3 { margin-bottom: .3rem; }
+  .clothing-diagram { position: relative; aspect-ratio: 1; margin-top: 1rem; background: #f3ead8; border-radius: 16px; }
+  .clothing-diagram img { position: absolute; left: 18%; top: 18%; width: 64%; height: auto; }
+  .clothing-lines { position: absolute; inset: 0; width: 100%; height: 100%; fill: #80613d; stroke: #80613d; stroke-width: .35; }
+  .clothing-label { position: absolute; display: flex; gap: .15rem; align-items: flex-start; width: 22%; font-size: 1rem; line-height: 1.5; font-weight: 700; }
+  .clothing-label b { flex-shrink: 0; }
+  .clothing-label.left { left: .15rem; }
+  .clothing-label.right { right: .15rem; }
+  .packing-checklist { margin-top: 2rem; }
+  .packing-list { list-style: none; padding: 0; margin: 1rem 0 2rem; border-top: 1px solid var(--border); }
+  .packing-list li { border-bottom: 1px solid var(--border); }
+  .packing-list label { display: flex; align-items: flex-start; gap: .8rem; padding: .85rem .2rem; min-height: 48px; cursor: pointer; }
+  .packing-list input { flex-shrink: 0; width: 24px; height: 24px; margin: .2rem 0 0; accent-color: var(--green); }
+  .packing-detail, .packing-detail > span { display: block; color: var(--muted); }
+  .packing-summary { padding: 1.2rem; border: 1px solid var(--border); border-radius: 10px; background: #fffdf8; }
+  .packing-summary > p:first-child { font-weight: 700; }
+  .packing-summary .service-note { margin-top: 1rem; }
+  .host-supplies { margin-top: 1.5rem; }
+</style>

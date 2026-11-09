@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import Access from '../components/Access.astro';
+import Packing from '../components/Packing.astro';
 import { event } from '../data/event';
 import { formatEventDate, weatherDecisionDate } from '../lib/event';
 
@@ -59,7 +60,7 @@ const decisionDate = weatherDecisionDate(event);
         <aside class="note"><strong>お子さんと一緒に行動してください。</strong>道具の使い方や掘る場所は、主催者の案内に従ってください。</aside>
       </section>
 
-      <!-- P3: 季節別の服装・持ち物コンポーネントをここに追加する。 -->
+      <Packing />
 
       <section id="weather" class="section" aria-labelledby="weather-title">
         <p class="eyebrow">お出かけ前に確認</p>

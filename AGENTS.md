@@ -4,7 +4,8 @@
 
 - Astro + TypeScriptによる静的サイト。UIフレームワーク、APIサーバー、ログイン、DBは追加しない。
 - 公開先は `https://ponta-farm.github.io/experience-guide/`。`astro.config.mjs` の `site` と `base` を維持する。内部リンクや公開資産の参照は `import.meta.env.BASE_URL` またはAstroのimportを使う。
-- 開催案内は `src/pages/index.astro`、アクセスは `src/components/Access.astro`、共通スタイルは `src/styles/global.css`。服装・周辺店舗は後続PRの担当範囲。
+- 開催案内は `src/pages/index.astro`、アクセスは `src/components/Access.astro`、服装・持ち物は `src/components/Packing.astro`、共通スタイルは `src/styles/global.css`。周辺店舗は後続PRの担当範囲。
+- 服装の注釈とチェック項目は `src/data/packing.ts` の同じデータを使う。保存済みチェックを維持するため項目IDを不用意に変更しない。季節・保存の処理は `src/lib/packing.ts` に置く。
 - 開催情報は `src/data/event.ts` に一元化し、日付・経路の生成は `src/lib/event.ts` に置く。新しい更新箇所と手順は実装と同時にREADMEへ追記する。
 - サイト側では位置情報の取得や出発地入力を実装しない。公開する連絡先は承認されたLINEのみ。
 
