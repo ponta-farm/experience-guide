@@ -1,0 +1,45 @@
+---
+import PlaceCard from './PlaceCard.astro';
+import { places } from '../data/places';
+
+const categories = [
+  { id: 'food', title: '食事', introduction: 'お昼ごはんや、帰りのお食事に。' },
+  { id: 'grocery', title: '食料品', introduction: '食べ物や飲み物の買い足しに。' },
+  { id: 'supplies', title: '忘れ物・作業用品', introduction: '着替えや作業に使う物を探すときに。在庫やサイズはお店でご確認ください。' },
+].map((category) => ({
+  ...category,
+  places: places.filter((place) => place.category === category.id)
+    .sort((left, right) => (left.roadKm ?? Number.MAX_SAFE_INTEGER) - (right.roadKm ?? Number.MAX_SAFE_INTEGER)),
+}));
+---
+
+<section id="nearby" class="section" aria-labelledby="nearby-title">
+  <p class="eyebrow">食事や買い足しに</p>
+  <h2 id="nearby-title">周辺のお店</h2>
+  <p>昼食は各自でご用意ください。お出かけ前に、営業時間や最新のお知らせを公式ページでご確認ください。</p>
+  <p class="service-note">距離・所要時間は地図でご確認ください。車の経路を開いたら、Google マップで出発地を選べます。</p>
+  <nav class="category-links" aria-label="お店の種類">
+    {categories.map((category) => <a href={`#nearby-${category.id}`}>{category.title} <span aria-hidden="true">↓</span></a>)}
+  </nav>
+  {categories.map((category) => (
+    <section class="place-category" id={`nearby-${category.id}`} aria-labelledby={`nearby-${category.id}-title`}>
+      <h3 id={`nearby-${category.id}-title`}>{category.title}</h3>
+      <p>{category.introduction}</p>
+      <ul class="places-grid">{category.places.slice(0, 3).map((place) => <PlaceCard place={place} />)}</ul>
+      {category.places.length > 3 && <details class="more-places">
+        <summary>{category.title}のお店をもっと見る（ほか{category.places.length - 3}店）</summary>
+        <ul class="places-grid">{category.places.slice(3).map((place) => <PlaceCard place={place} />)}</ul>
+      </details>}
+    </section>
+  ))}
+</section>
+
+<style>
+  .category-links { display: flex; flex-wrap: wrap; gap: .5rem 1.3rem; margin-block: 1.5rem; }
+  .category-links a { display: inline-flex; align-items: center; gap: .4rem; min-height: 44px; font-weight: 700; }
+  .place-category { margin-top: 2.2rem; }
+  .places-grid { list-style: none; padding: 0; display: grid; gap: 1rem; margin: 1.2rem 0; }
+  .more-places { border-top: 1px solid var(--border); }
+  .more-places summary { min-height: 48px; }
+  @media (min-width: 48rem) { .places-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+</style>
