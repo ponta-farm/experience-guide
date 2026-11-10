@@ -1,0 +1,35 @@
+---
+import { event } from '../data/event';
+import { drivingUrl, mapUrl, transitUrl } from '../lib/event';
+---
+
+<section id="access" class="section" aria-labelledby="access-title">
+  <p class="eyebrow">まずは、ここで待ち合わせ</p>
+  <h2 id="access-title">集合場所・アクセス</h2>
+  <p>電車でも車でも、集合場所から畑へご案内します。到着予定を事前にLINEでお知らせください。</p>
+  <div class="card-grid">
+    <article class="card">
+      <p class="tag">電車で来る方</p>
+      <h3>{event.station.meetingPoint}</h3>
+      <p>駅から送迎します。<strong>到着時間は事前にLINEでご相談ください。</strong></p>
+      <p>乗換検索は土浦駅に{event.stationArrivalTime}到着を目安にしています。全員がこの時刻に集合する必要はありません。</p>
+      <a class="button" href={transitUrl(event)} data-transit-link hidden>電車の行き方を調べる <span aria-hidden="true">↗</span></a>
+      <noscript>
+        <a class="button" href="https://transit.yahoo.co.jp/">Yahoo!路線情報を開く ↗</a>
+        <p>上の開催日時を確認し、土浦駅への到着日・時刻を選んで検索してください。</p>
+      </noscript>
+      <p class="service-note">出発駅はYahoo!路線情報で選べます。</p>
+    </article>
+    <article class="card">
+      <p class="tag">車で来る方</p>
+      <h3>{event.carMeeting.name}</h3>
+      <p>{event.carMeeting.address}</p>
+      <p>こちらで待ち合わせてから畑へ向かいます。到着後は主催者の案内に従ってください。</p>
+      <div class="actions">
+        <a class="button" href={drivingUrl(event.carMeeting)}>車の行き方を調べる <span aria-hidden="true">↗</span></a>
+        <a class="text-link" href={mapUrl(event.carMeeting)}>集合場所の地図を見る ↗</a>
+      </div>
+      <p class="service-note">出発地はGoogle マップで選べます。</p>
+    </article>
+  </div>
+</section>

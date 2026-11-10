@@ -1,5 +1,12 @@
 ---
 import '../styles/global.css';
+import Access from '../components/Access.astro';
+import Packing from '../components/Packing.astro';
+import Nearby from '../components/Nearby.astro';
+import { event } from '../data/event';
+import { formatEventDate, weatherDecisionDate } from '../lib/event';
+
+const decisionDate = weatherDecisionDate(event);
 ---
 
 <!doctype html>
@@ -7,14 +14,114 @@ import '../styles/global.css';
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="ぽんたファームの体験農業の案内を準備しています。" />
+    <meta name="description" content="ぽんたファームの体験農業。集合場所、当日の流れ、雨天のご案内をまとめました。" />
+    <meta name="theme-color" content="#faf6ed" />
     <title>体験農業のご案内 | ぽんたファーム</title>
   </head>
   <body>
-    <main>
-      <p class="farm-name">ぽんたファーム</p>
-      <h1>案内を準備しています</h1>
-      <p>体験農業のご案内を、こちらに掲載する予定です。</p>
+    <a class="skip-link" href="#main">本文へ移動</a>
+    <header class="site-header wrap">
+      <a class="brand" href={import.meta.env.BASE_URL}>ぽんたファーム</a>
+      <a class="header-contact" href="#contact">LINEで相談 <span aria-hidden="true">↗</span></a>
+    </header>
+    <main id="main" class="wrap">
+      <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">土浦で、体験農業</p>
+        <h1 id="page-title">畑でいっしょに、<br />収穫の一日。</h1>
+        <p class="hero-intro">土にふれて、掘って、持ち帰る。<br />初めての方も、自分のペースでどうぞ。</p>
+        <div class="event-card">
+          <p class="eyebrow">開催日時</p>
+          <p class="event-date"><time datetime={event.date}>{formatEventDate(event.date, true)}</time></p>
+          <p class="event-time">{event.startTime} <span aria-label="から">—</span> {event.endTime} <span class="tag">自由集合</span></p>
+          <p class="activities">{event.activities.join('・')}</p>
+          <p class="ended-notice" data-ended-notice role="status" hidden>この開催は終了しました。開催内容や準備の案内は引き続きご覧いただけます。</p>
+          <noscript><p>開催状況は、上の日時と主催者からのLINEの案内をご確認ください。</p></noscript>
+        </div>
+        <p class="event-note">参加無料 · 収穫物のお礼あり<br />昼食の提供はありません。各自でご用意ください。</p>
+      </section>
+
+      <nav class="page-nav" aria-label="このページの案内">
+        <a href="#access">集合場所 <span aria-hidden="true">↓</span></a>
+        <a href="#day">当日の流れ <span aria-hidden="true">↓</span></a>
+        <a href="#weather">天気・開催判断 <span aria-hidden="true">↓</span></a>
+        <a href="#faq">よくある質問 <span aria-hidden="true">↓</span></a>
+      </nav>
+
+      <Access />
+
+      <section id="day" class="section" aria-labelledby="day-title">
+        <p class="eyebrow">のんびり、ひとつずつ</p>
+        <h2 id="day-title">当日の流れ</h2>
+        <ol class="day-steps">
+          <li><h3>集合場所で待ち合わせ</h3><p>相談した到着時間に合わせてお越しください。</p></li>
+          <li><h3>畑へご案内</h3><p>道具の使い方や掘る場所をお伝えします。</p></li>
+          <li><h3>いっしょに芋掘り</h3><p>休憩をはさみながら、無理のないペースで。</p></li>
+          <li><h3>片付け・持ち帰り</h3><p>使った道具を片付けて、収穫物をお土産に。</p></li>
+        </ol>
+        <aside class="note"><strong>お子さんと一緒に行動してください。</strong>道具の使い方や掘る場所は、主催者の案内に従ってください。</aside>
+      </section>
+
+      <Packing />
+
+      <section id="weather" class="section" aria-labelledby="weather-title">
+        <p class="eyebrow">お出かけ前に確認</p>
+        <h2 id="weather-title">天気と開催について</h2>
+        <div class="weather-card">
+          <p class="eyebrow">雨天の判断は開催{event.weather.decisionDaysBefore}日前</p>
+          <p class="decision-date"><time datetime={`${decisionDate}T${event.weather.decisionTime}:00+09:00`}>{formatEventDate(decisionDate)} {event.weather.decisionTime}</time>まで</p>
+          <p>開催の判断はLINEでご案内します。<strong>当日や前日が小雨でも、中止または延期とします。</strong></p>
+          <a class="button secondary" href={event.weather.nhkUrl}>NHKで天気を確認する <span aria-hidden="true">↗</span></a>
+          <p class="service-note">NHKの天気ページで「茨城県・土浦市」を選んでください。</p>
+        </div>
+        <ul class="care-list">
+          <li>最高気温が30℃を超えるときは、作業時間を調整します。</li>
+          <li>体調に不安があるときは、直前でもLINEでご連絡ください。</li>
+          <li>花粉や蜂にご注意ください。気になることは事前にご相談ください。</li>
+        </ul>
+      </section>
+
+      <Nearby />
+
+      <section id="faq" class="section" aria-labelledby="faq-title">
+        <p class="eyebrow">気になることを、先に</p>
+        <h2 id="faq-title">よくある質問</h2>
+        <div class="faq-list">
+          <details><summary>昼食は用意されていますか？</summary><p>昼食の提供はありません。各自でご用意ください。</p></details>
+          <details><summary>道具や長靴は借りられますか？</summary><p>シャベル・スコップ・大人用軍手は主催者が用意します。子ども用の軍手や長靴はほとんど用意がないため、ご持参ください。</p><p>大人用長靴の貸出は事前相談です。<strong><time datetime={event.bootRentalDeadline.date}>{formatEventDate(event.bootRentalDeadline.date)}</time> {event.bootRentalDeadline.period}まで</strong>にLINEでご相談ください。</p></details>
+          <details><summary>トイレや手洗いは使えますか？</summary><p>主催者宅のトイレ・手洗い・休憩場所をご利用いただけます。畑に着いてからご案内します。</p></details>
+          <details><summary>雨が降りそうなときは？</summary><p>{formatEventDate(decisionDate)} {event.weather.decisionTime}までに判断し、LINEでご案内します。当日・前日の小雨でも、中止または延期とします。</p></details>
+          <details><summary>参加費やお土産について教えてください</summary><p>参加無料です。時給のお支払いはありませんが、作業のお礼に収穫物をお渡しします。主催者へのお土産は、お気持ちだけで十分です。</p></details>
+        </div>
+      </section>
+
+      <section id="contact" class="section contact-card" aria-labelledby="contact-title">
+        <p class="eyebrow">到着時間も、貸出の相談も</p>
+        <h2 id="contact-title">連絡はLINEへ</h2>
+        <p>送迎の時間や気になることを、<br />ぽんたファームへお知らせください。</p>
+        <a class="line-button" href={event.contact.lineUrl}><img src={event.contact.addFriendImage} width="232" height="72" alt="LINEで友だち追加" loading="lazy" /></a>
+        <p><a class="text-link" href={event.contact.lineUrl}>ぽんたファームのLINEを開く ↗</a><br /><span class="service-note">公式アカウント {event.contact.lineId}</span></p>
+        <p>お急ぎのときは、LINE公式アカウントの通話機能をご利用ください。</p>
+      </section>
     </main>
+    <footer class="site-footer wrap"><p>ぽんたファーム · 体験農業のご案内</p><a href="#page-title">ページの先頭へ ↑</a></footer>
+    <script>
+      import { event } from '../data/event';
+      import { isEventEnded } from '../lib/event';
+
+      // ビルド日時ではなく、閲覧時・復帰時の時計で案内を切り替える。
+      function updateEventStatus() {
+        const ended = isEventEnded(event, new Date());
+        document.querySelectorAll<HTMLElement>('[data-ended-notice]').forEach((notice) => {
+          notice.hidden = !ended;
+        });
+        document.querySelectorAll<HTMLElement>('[data-transit-link]').forEach((link) => {
+          link.hidden = ended;
+        });
+      }
+      updateEventStatus();
+      window.setInterval(updateEventStatus, 1000);
+      window.addEventListener('pageshow', updateEventStatus);
+      document.addEventListener('visibilitychange', updateEventStatus);
+    </script>
   </body>
 </html>
