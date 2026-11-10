@@ -1,0 +1,25 @@
+{
+  "name": "experience-guide",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.22.2"
+  },
+  "packageManager": "npm@11.19.1",
+  "scripts": {
+    "dev": "astro dev",
+    "check": "astro check",
+    "test": "node --test",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "7.4.7"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.12",
+    "@types/node": "24.19.2",
+    "typescript": "6.0.3"
+  }
+}
