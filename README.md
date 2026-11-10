@@ -2,7 +2,7 @@
 
 ぽんたファームの参加者が、スマホで集合・準備・当日の過ごし方を確認するための静的サイトです。
 
-開催日時、集合場所、当日の流れ、天候判断、FAQ、LINEでの連絡を掲載しています。季節別の服装・持ち物と周辺店舗は後続PRで追加します。この段階だけで案内全体の完成とは扱いません。
+開催日時、集合場所、当日の流れ、季節別の服装・持ち物、天候判断、FAQ、LINEでの連絡を掲載しています。食事や買い足しに使える周辺店舗も掲載しています。
 
 公開予定先: <https://ponta-farm.github.io/experience-guide/>
 
@@ -27,7 +27,7 @@ npm test
 npm run build
 ```
 
-`check` はAstroとTypeScriptの診断、`test` はNode標準テストランナー、`build` は `dist/` への静的出力です。現在のユニットは `tests/event.test.ts` の2件で、日時設定の変更と乗換URL・保存キーの対応、車経路に出発地を含めないことを確認します。季節・保存の2群は後続PRで追加します。NodeのTypeScript実行ではimportに `.ts` 拡張子を付け、型だけのimportには `import type` を使います。
+`check` はAstroとTypeScriptの診断、`test` はNode標準テストランナー、`build` は `dist/` への静的出力です。ユニットは日時・経路、季節境界、保存の3群です。`tests/event.test.ts` で日時設定と乗換URL・保存キー、車経路の出発地非付与を確認し、`tests/packing.test.ts` で日本時間の6月・10月・年越し境界と保存復元・未知ID・破損・保存拒否を確認します。NodeのTypeScript実行ではimportに `.ts` 拡張子を付け、型だけのimportには `import type` を使います。
 
 画面は390px幅を中心に300〜400px幅で目視し、主要リンクとJavaScript無効時の本文も確認します。画面画像は `docs/previews/p2-mobile.png` に保存します。ブラウザの単純な画面撮影を用い、E2E環境やジョブは追加しません。
 
@@ -41,6 +41,12 @@ npm run build
 | 日付表示・雨天判断日・終了判定・経路URL・保存キー | `src/lib/event.ts` |
 | 開催案内・当日の流れ・天気・FAQ | `src/pages/index.astro` |
 | 電車・車の集合案内 | `src/components/Access.astro` |
+| 服装の番号・注釈・持ち物・準備区分 | `src/data/packing.ts` |
+| 季節判定・保存復元 | `src/lib/packing.ts` |
+| 服装画像・チェックリストの表示と操作 | `src/components/Packing.astro` |
+| 周辺店舗の内容・営業情報・距離・確認日 | `src/data/places.ts` |
+| 周辺店舗の分類・表示件数と店舗カード | `src/components/Nearby.astro`、`PlaceCard.astro` |
+| 店舗の確認根拠・除外理由 | `docs/nearby-sources.md` |
 | 基本スタイル | `src/styles/global.css` |
 | 公開先・base path | `astro.config.mjs` |
 | Node・依存バージョン | `.nvmrc`、`package.json`、`package-lock.json` |
@@ -55,7 +61,25 @@ npm run build
 
 終了表示は閲覧時の端末時計で判定し、終了時刻を過ぎたら終了済みの案内を出して日時付きの乗換ボタンを隠します。開いたままのページや画面復帰時にも更新します。次の開催日時は推定しません。JavaScriptが無効でも本文・FAQ・LINE・地図・天気リンクは読めます。この場合、過去日時へ誘導しないよう、乗換は日付未指定のトップへのリンクを表示します。
 
-後続の服装・持ち物は当日の流れの後、周辺店舗は天気案内の後に追加する位置をコメントで示しています。
+服装・持ち物は当日の流れの後に表示します。周辺店舗は天気案内の後に表示します。
+
+### 服装・持ち物の更新
+
+`src/data/packing.ts` の `clothing` が画像の番号付き注釈とチェック項目の共通データです。番号・表示名・季節別の説明・注釈位置をここで変更します。画像を差し替えた場合は引き出し線の指す位置と、300〜400px幅で顔・衣服と注釈が重ならないことを確認してください。画像の原本は `src/assets/clothing-summer-v2.png` と `clothing-winter-v2.png`、配信時はAstroでWebPへ圧縮します。
+
+季節は閲覧時の日本時間で判定し、6〜9月は夏、10〜5月は冬です。切替は服装表示だけに作用し、開催日やチェックを変更しません。JavaScriptが無効な場合は夏冬の両方を表示します。
+
+保存キーは `experience-guide:開催日:checklist:v1` です。チェックした項目の安定IDだけをlocalStorageへ保存し、同じ開催日の再訪で復元します。項目名を直してもIDを変更しなければチェックが残ります。未知IDは無視し、壊れた保存内容は空として説明を表示します。読み書きを拒否された場合も画面内のチェックは続けられます。リセットは現在の開催日だけに作用し、サーバー送信・端末間同期はありません。
+
+`householdItems` は各家庭の持参品、`optionalItems` はあると便利な品です。主催者の用意する物はチェック欄に追加しません。子ども用軍手・長靴の持参と大人用長靴の貸出相談期限を、開催情報の更新時に確認してください。
+
+### 周辺店舗の更新
+
+`src/data/places.ts` の掲載19店と、`docs/nearby-sources.md` の除外3店を、開催日の更新時に全件再確認します。店名・住所・料理や取扱品・通常営業時間・開催日の休業告知を公式情報で確認し、`checkedAt` と出典文書を更新してください。子ども向け設備や商品の在庫は推測して追加しません。
+
+`roadKm` と `carMinutes` は畑を起点にした道路経路で確認できた場合だけ入力し、取得できない場合は両方nullにします。`distanceSource` に確認状況と日付を残します。確認できた道路距離を近い順、未取得を末尾に並べ、同じ未取得同士はデータの順序を維持します。現在は全件未取得です。経路ボタンの出発地は設定しません。
+
+分類ごとに最初の3店を表示し、残りは「もっと見る」で開きます。標準のdetails/summaryを使うためJavaScriptなしでも開けます。更新後はcheck/test/build、300〜400px幅の目視、公式・車経路リンクを確認し、`docs/previews/p4-mobile.png` を更新してください。店舗データをなぞるユニットやE2Eは追加しません。
 
 ### 外部リンクと埋め込みの確認
 
