@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Access from '../components/Access.astro';
 import Packing from '../components/Packing.astro';
+import Nearby from '../components/Nearby.astro';
 import { event } from '../data/event';
 import { formatEventDate, weatherDecisionDate } from '../lib/event';
 
@@ -79,7 +80,7 @@ const decisionDate = weatherDecisionDate(event);
         </ul>
       </section>
 
-      <!-- P4: 周辺のお店コンポーネントをここに追加する。 -->
+      <Nearby />
 
       <section id="faq" class="section" aria-labelledby="faq-title">
         <p class="eyebrow">気になることを、先に</p>
