@@ -1,5 +1,5 @@
 export const event = {
-  date: '2026-11-15',
+  date: '', // 空欄なら準備中。入力例: '2027-06-02'（YYYY-MM-DD）
   startTime: '09:00',
   endTime: '16:00',
   stationArrivalTime: '11:15',

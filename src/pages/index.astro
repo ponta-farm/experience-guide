@@ -6,7 +6,8 @@ import Nearby from '../components/Nearby.astro';
 import { event } from '../data/event';
 import { formatEventDate, weatherDecisionDate } from '../lib/event';
 
-const decisionDate = weatherDecisionDate(event);
+const hasEventDate = event.date.trim().length > 0;
+const decisionDate = hasEventDate ? weatherDecisionDate(event) : '';
 ---
 
 <!doctype html>
@@ -14,11 +15,21 @@ const decisionDate = weatherDecisionDate(event);
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="ぽんたファームの体験農業。集合場所、当日の流れ、雨天のご案内をまとめました。" />
+    <meta name="description" content={hasEventDate
+      ? 'ぽんたファームの体験農業。集合場所、当日の流れ、雨天のご案内をまとめました。'
+      : 'ぽんたファームの体験農業の案内を準備しています。'} />
     <meta name="theme-color" content="#faf6ed" />
     <title>体験農業のご案内 | ぽんたファーム</title>
   </head>
   <body>
+    {!hasEventDate ? (
+      <main class="preparing">
+        <p class="farm-name">ぽんたファーム</p>
+        <h1>案内を準備しています</h1>
+        <p>体験農業のご案内を、こちらに掲載する予定です。</p>
+      </main>
+    ) : (
+    <>
     <a class="skip-link" href="#main">本文へ移動</a>
     <header class="site-header wrap">
       <a class="brand" href={import.meta.env.BASE_URL}>ぽんたファーム</a>
@@ -104,6 +115,8 @@ const decisionDate = weatherDecisionDate(event);
       </section>
     </main>
     <footer class="site-footer wrap"><p>ぽんたファーム · 体験農業のご案内</p><a href="#page-title">ページの先頭へ ↑</a></footer>
+    </>
+    )}
     <script>
       import { event } from '../data/event';
       import { isEventEnded } from '../lib/event';
@@ -118,10 +131,35 @@ const decisionDate = weatherDecisionDate(event);
           link.hidden = ended;
         });
       }
-      updateEventStatus();
-      window.setInterval(updateEventStatus, 1000);
-      window.addEventListener('pageshow', updateEventStatus);
-      document.addEventListener('visibilitychange', updateEventStatus);
+      // 準備中では終了の日時計算・タイマー登録を始めない。
+      if (document.querySelector('[data-ended-notice]')) {
+        updateEventStatus();
+        window.setInterval(updateEventStatus, 1000);
+        window.addEventListener('pageshow', updateEventStatus);
+        document.addEventListener('visibilitychange', updateEventStatus);
+      }
     </script>
   </body>
 </html>
+
+<style>
+  .preparing {
+    width: min(100% - 2rem, 40rem);
+    margin: 4rem auto;
+    padding-block: 1.5rem;
+    border-block-start: 4px solid #4b6748;
+    font-family: system-ui, sans-serif;
+    line-height: 1.8;
+  }
+  .preparing .farm-name {
+    color: #4b6748;
+    font-weight: 700;
+    margin-block: 1em;
+  }
+  .preparing h1 {
+    font-size: 1.5rem;
+    line-height: 1.5;
+    margin-block: .67em;
+  }
+  .preparing > p:last-child { margin-block: 1em; }
+</style>

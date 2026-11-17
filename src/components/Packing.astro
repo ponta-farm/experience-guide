@@ -65,42 +65,47 @@ const seasons = [
   import { checklistStorageKey } from '../lib/event';
   import { restoreChecklist, saveChecklist, seasonAt } from '../lib/packing';
 
-  const root = document.querySelector<HTMLElement>('#packing')!;
-  const buttons = root.querySelectorAll<HTMLButtonElement>('[data-season]');
-  function selectSeason(season: Season) {
-    root.querySelectorAll<HTMLElement>('[data-clothing-season]').forEach((element) => {
-      element.hidden = element.dataset.clothingSeason !== season;
-    });
-    buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.season === season)));
-  }
-  selectSeason(seasonAt(new Date()));
-  root.querySelector<HTMLElement>('[data-season-switch]')!.hidden = false;
-  buttons.forEach((button) => button.addEventListener('click', () => selectSeason(button.dataset.season as Season)));
+  function initializePacking() {
+    const root = document.querySelector<HTMLElement>('#packing');
+    // 条件付き描画でもscriptは配信されるため、DOM不在なら保存処理へ進めない。
+    if (!root) return;
+    const buttons = root.querySelectorAll<HTMLButtonElement>('[data-season]');
+    const selectSeason = (season: Season) => {
+      root.querySelectorAll<HTMLElement>('[data-clothing-season]').forEach((element) => {
+        element.hidden = element.dataset.clothingSeason !== season;
+      });
+      buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.season === season)));
+    };
+    selectSeason(seasonAt(new Date()));
+    root.querySelector<HTMLElement>('[data-season-switch]')!.hidden = false;
+    buttons.forEach((button) => button.addEventListener('click', () => selectSeason(button.dataset.season as Season)));
 
-  const inputs = [...root.querySelectorAll<HTMLInputElement>('[data-packing-id]')];
-  const key = checklistStorageKey(event);
-  const storage = () => window.localStorage;
-  const restored = restoreChecklist(storage, key, checklistIds);
-  const warning = root.querySelector<HTMLElement>('[data-packing-warning]')!;
-  function showWarning(message: string) { warning.textContent = message; warning.hidden = !message; }
-  inputs.forEach((input) => { input.checked = restored.checked.includes(input.dataset.packingId!); });
-  if (restored.issue === 'unavailable') showWarning('この端末では保存できません。チェックはこの画面で使えます。');
-  if (restored.issue === 'corrupt') showWarning('保存されたチェックを読み込めなかったため、空の状態で始めます。');
-  function updateCount() {
-    root.querySelector<HTMLElement>('[data-packing-count]')!.textContent = `準備済み ${inputs.filter((input) => input.checked).length} / ${inputs.length} 件（あると便利なものを含む）`;
-  }
-  function persist() {
-    const checked = inputs.filter((input) => input.checked).map((input) => input.dataset.packingId!);
-    showWarning(saveChecklist(storage, key, checked) ? '' : 'この端末では保存できません。チェックはこの画面で使えます。');
+    const inputs = [...root.querySelectorAll<HTMLInputElement>('[data-packing-id]')];
+    const key = checklistStorageKey(event);
+    const storage = () => window.localStorage;
+    const restored = restoreChecklist(storage, key, checklistIds);
+    const warning = root.querySelector<HTMLElement>('[data-packing-warning]')!;
+    function showWarning(message: string) { warning.textContent = message; warning.hidden = !message; }
+    inputs.forEach((input) => { input.checked = restored.checked.includes(input.dataset.packingId!); });
+    if (restored.issue === 'unavailable') showWarning('この端末では保存できません。チェックはこの画面で使えます。');
+    if (restored.issue === 'corrupt') showWarning('保存されたチェックを読み込めなかったため、空の状態で始めます。');
+    const updateCount = () => {
+      root.querySelector<HTMLElement>('[data-packing-count]')!.textContent = `準備済み ${inputs.filter((input) => input.checked).length} / ${inputs.length} 件（あると便利なものを含む）`;
+    };
+    function persist() {
+      const checked = inputs.filter((input) => input.checked).map((input) => input.dataset.packingId!);
+      showWarning(saveChecklist(storage, key, checked) ? '' : 'この端末では保存できません。チェックはこの画面で使えます。');
+      updateCount();
+    }
+    inputs.forEach((input) => input.addEventListener('change', persist));
+    root.querySelector<HTMLButtonElement>('[data-packing-reset]')!.addEventListener('click', () => {
+      inputs.forEach((input) => { input.checked = false; });
+      persist();
+    });
     updateCount();
+    root.querySelector<HTMLElement>('[data-packing-controls]')!.hidden = false;
   }
-  inputs.forEach((input) => input.addEventListener('change', persist));
-  root.querySelector<HTMLButtonElement>('[data-packing-reset]')!.addEventListener('click', () => {
-    inputs.forEach((input) => { input.checked = false; });
-    persist();
-  });
-  updateCount();
-  root.querySelector<HTMLElement>('[data-packing-controls]')!.hidden = false;
+  initializePacking();
 </script>
 
 <style>
