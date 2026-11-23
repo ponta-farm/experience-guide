@@ -6,7 +6,8 @@ import { checklistStorageKey, drivingUrl, transitUrl } from '../src/lib/event.ts
 
 test('開催設定の変更が乗換の到着日時と保存キーへ反映され、出発地を付けない', () => {
   const cases: [EventConfig, Record<string, string>, string][] = [
-    [event, { to: '土浦', y: '2026', m: '11', d: '15', hh: '11', m1: '1', m2: '5', type: '4' },
+    [{ ...event, date: '2026-11-15', stationArrivalTime: '11:15' },
+      { to: '土浦', y: '2026', m: '11', d: '15', hh: '11', m1: '1', m2: '5', type: '4' },
       'experience-guide:2026-11-15:checklist:v1'],
     [{ ...event, date: '2027-06-02', stationArrivalTime: '08:05' },
       { to: '土浦', y: '2027', m: '06', d: '02', hh: '08', m1: '0', m2: '5', type: '4' },
